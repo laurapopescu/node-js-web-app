@@ -1,0 +1,4 @@
+body, #chart-area, #widget-container, .tv-main-panel {background: #000;}
+.chart-page .chart-container {border: black solid 0;}
+
+div {width: 980px;height:400px; margin:0 auto;}
