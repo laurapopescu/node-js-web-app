@@ -2,23 +2,51 @@ const express = require('express');
 const http = require('http'); 
 const bodyParser = require('body-parser');
 const path = require('path');
-
-
-const api = require('./routes/api');
-
+const passport = require('passport');
+const config = require('./config/secret');
+const mongoose = require('mongoose');
+const models = require('./models/user');
+const passportController = require('./config/passport');
+const jwt = require('express-jwt');
 const app = express();
+
+const profileController = require('./controllers/profile');
+const authenticationController = require('./controllers/authentication');
+
+const auth = jwt({ 
+    secret : config.secret,
+    userProperty: 'payload'
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'dist'))); 
-app.use('/api', api); 
+app.use(express.static(path.join(__dirname, 'dist')));
 
-app.get('*', (req, res) => { 
+// app.use(session({
+//     resave: true,
+//     saveUninitialized: true,
+//     secret: config.secret,
+//     store: new MongoStore({ url: config.database, autoReconnect: true })
+// }));
+
+app.use(passport.initialize());
+
+//routes
+app.get('/profile', auth, profileController.profileRead);
+app.post('/register', authenticationController.register);
+app.post('/login', authenticationController.login);
+
+app.get('/', (req, res) => { 
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
-const port = process.env.PORT || '3000'; 
-app.set('port', port);
+//database connection
+mongoose.connect(config.database, function(err) { 
+    if (err) console.log(err);
 
+    console.log("Connected to the database");
+})
+
+app.set('port', config.port);
 const server = http.createServer(app); 
-server.listen(port, () => console.log(`Listening on local port ${port}`));
+server.listen(config.port, () => console.log(`Running on port ${config.port}`));
