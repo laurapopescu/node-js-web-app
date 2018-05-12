@@ -32,9 +32,9 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.use(passport.initialize());
 
 //routes
-app.get('/profile', auth, profileController.profileRead);
-app.post('/register', authenticationController.register);
-app.post('/login', authenticationController.login);
+app.get('/api/profile', auth, profileController.profileRead);
+app.post('/api/register', authenticationController.register);
+app.post('/api/login', authenticationController.login);
 
 app.get('/', (req, res) => { 
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
